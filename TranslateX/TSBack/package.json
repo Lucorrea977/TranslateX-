@@ -1,0 +1,20 @@
+{
+  "name": "tsback",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js"
+  },
+  "author": "Luana Camila Correa",
+  "license": "ISC",
+  "description": "Backend para TranslateX con Express y LibreTranslate",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
