@@ -1,21 +1,13 @@
 const axios = require("axios");
 
-exports.translateWithAPI = async (text, targetLang) => {
+exports.translateWithAPI = async (text, sourceLang, targetLang) => {
   try {
-    const response = await axios.post(
-      "https://libretranslate.com/translate",
-      {
-        q: text,
-        source: "auto",
-        target: targetLang,
-        format: "text"
-      },
-      { headers: { "Content-Type": "application/json" } }
-    );
-
-    return response.data.translatedText;
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`;
+    const response = await axios.get(url);
+    const translated = response.data.responseData.translatedText;
+    return translated || "No se pudo traducir";
   } catch (error) {
-    console.error("❌ Error llamando a la API de traducción:", error.message);
+    console.error("❌ Error llamando a MyMemory API:", error.response?.data || error.message);
     return "Error en traducción";
   }
 };

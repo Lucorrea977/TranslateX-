@@ -10,6 +10,7 @@ const VoiceTranslator = () => {
 
   let recognition;
 
+  // Configuración de reconocimiento de voz
   if ("webkitSpeechRecognition" in window) {
     recognition = new window.webkitSpeechRecognition();
     recognition.continuous = false;
@@ -25,21 +26,36 @@ const VoiceTranslator = () => {
     setListening(true);
     recognition.start();
 
-    recognition.onresult = (event) => {
+    recognition.onresult = async (event) => {
       const text = event.results[0][0].transcript;
       setTranscript(text);
 
-      // Simulación de traducción
-      const translatedText = "Traducción simulada: " + text;
-      setTranslated(translatedText);
+      try {
+        // ✅ Enviar texto al backend para traducir
+        const res = await fetch("http://localhost:5000/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, targetLang: "es" })
+        });
 
-      // Guardar en historial
-      dispatch(addToHistory({
-        id: Date.now(),
-        original: text,
-        translated: translatedText,
-        date: new Date().toLocaleString(),
-      }));
+        const data = await res.json();
+        const translatedText = data.translated;
+
+        // ✅ Actualizar estado con la traducción real
+        setTranslated(translatedText);
+
+        // ✅ Guardar en historial Redux
+        dispatch(addToHistory({
+          id: Date.now(),
+          original: text,
+          translated: translatedText,
+          date: new Date().toLocaleString(),
+        }));
+
+      } catch (err) {
+        console.error("❌ Error al traducir voz:", err);
+        setTranslated("⚠️ Error al traducir.");
+      }
     };
 
     recognition.onend = () => setListening(false);
@@ -48,6 +64,7 @@ const VoiceTranslator = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">Traductor de Voz</h2>
+
       <button
         onClick={startListening}
         disabled={listening}

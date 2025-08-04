@@ -2,12 +2,18 @@ const { translateWithAPI } = require("../services/translationAPI");
 
 exports.translateText = async (req, res) => {
   try {
-    const { text, targetLang } = req.body;
-    if (!text) {
-      return res.status(400).json({ error: "El campo 'text' es obligatorio" });
+    const { text, sourceLang, targetLang } = req.body;
+    console.log("Recibido en backend:", { text, sourceLang, targetLang });
+
+    if (!text || !sourceLang || !targetLang) {
+      return res.status(400).json({ error: "Faltan datos para traducir" });
+    }
+    if (sourceLang === targetLang) {
+      return res.json({ translated: "Por favor, elige idiomas diferentes" });
     }
 
-    const translation = await translateWithAPI(text, targetLang || "es");
+    const translation = await translateWithAPI(text, sourceLang, targetLang);
+
     res.json({ translated: translation });
   } catch (err) {
     console.error("❌ Error en el controlador:", err.message);
